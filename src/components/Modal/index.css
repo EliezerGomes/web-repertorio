@@ -1,0 +1,153 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  backdrop-filter: blur(4px); 
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+  background-color: #222A3D;
+  width: 100%;
+  max-width: 440px;
+  border-radius: 28px;
+  padding: 32px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  animation: modalAppear 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.close-button {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.close-button:hover {
+  color: #ffffff;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-group label {
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.modal-input {
+  background-color: #0f172a; /* Cor interna dos inputs */
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 16px;
+  color: #ffffff;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.modal-input:focus {
+  border-color: #d8b4fe; /* Cor de foco lilás suave */
+}
+
+.modal-input::placeholder {
+  color: #475569;
+}
+
+/* Select customizado */
+.select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.modal-select {
+  width: 100%;
+  appearance: none; /* Remove a seta padrão do navegador */
+  cursor: pointer;
+}
+
+.select-icon {
+  position: absolute;
+  right: 16px;
+  color: #475569;
+  pointer-events: none;
+}
+
+/* Input com ícone do YouTube */
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inner-icon {
+  position: absolute;
+  left: 16px;
+  color: #475569;
+}
+
+.modal-input.with-icon {
+  padding-left: 48px;
+  width: 100%;
+}
+
+/* Botão Salvar */
+.save-button {
+  background-color: #f0abff; /* Tom lilás vibrante da imagem */
+  color: #4c1d95; /* Cor do texto interna (roxo escuro) */
+  border: none;
+  border-radius: 16px;
+  padding: 18px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: transform 0.1s, opacity 0.2s;
+}
+
+.save-button:hover {
+  opacity: 0.9;
+}
+
+.save-button:active {
+  transform: scale(0.98);
+}
+
+@keyframes modalAppear {
+  from { 
+    opacity: 0; 
+    transform: scale(0.9) translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1) translateY(0); 
+  }
+}

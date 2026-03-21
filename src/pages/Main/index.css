@@ -1,0 +1,20 @@
+.main-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 45px;
+  margin: 35px 25px;
+  
+}
+
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+
+.subtitle {
+  max-width: 560px;
+  margin: 0 auto;
+}

@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+:root {
+  /* Primary */
+  --primary: #1A237E;
+
+  /* Secondary */
+  --secondary: #475569;
+
+  /* Tertiary */
+  --tertiary: #9D50BB;
+  --tertiary-100: #DAE2FD;
+
+  /* Neutral */
+  --neutral: #0F172A;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+  font-family: "Inter", sans-serif;
+  color: var(--tertiary-100);
+}
+
+.container-principal {
+  height: 100vh;
+  position: relative;
+}
+
+/* Headline */
+.text-headline {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 40px;
+  font-family: "Plus Jakarta Sans", sans-serif;;
+}
+
+/* Body */
+.text-body {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+/* Label */
+.text-label {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0.5px;
+}
+
+.text-primary {
+  color: #DAE2FD;
+}
+
+.text-secondary {
+  color: #C6C5D4;
+;
+}

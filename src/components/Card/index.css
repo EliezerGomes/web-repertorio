@@ -1,0 +1,80 @@
+.evento-card {
+  display: flex;
+  align-items: center;
+  background-color: #161F33; /* Fundo escuro do card */
+  border-radius: 14px;
+  padding: 16px 24px;
+  gap: 20px;
+  width: 100%;
+  max-width: 500px; /* Ajuste conforme necessário */
+}
+
+.evento-icon-container {
+  background-color: #1a237e; /* Sua variável --primary */
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.evento-icon {
+  color: #9eb1ff; /* Um tom mais claro do ícone */
+  background: #1a237e;
+}
+
+.evento-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: transparent;
+}
+
+/* Reutilizando/Ajustando suas classes de texto */
+.text-headline-small {
+background: transparent;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.evento-details {
+    background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.text-label-caps {
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+.dot {
+  font-size: 18px;
+}
+
+.evento-button {
+    background: transparent;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 100px; /* Formato pílula */
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  transition: background 0.3s ease;
+}
+
+.evento-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}

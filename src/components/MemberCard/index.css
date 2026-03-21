@@ -1,0 +1,123 @@
+.member-card {
+  background-color: #161F33; /* Sua --primary, ajustada para fundo */
+  border-radius: 20px;
+  padding: 24px;
+  width: 150px;
+  height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.member-avatar-container {
+  position: relative;
+  width: 70px;
+  height: 70px;
+}
+
+.member-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ffffff; /* Borda branca fina ao redor da imagem */
+}
+
+.member-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+}
+
+.member-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: #475569; /* Sua --secondary, ou a cor que preferir */
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.member-badge-icon {
+  color: #ffffff;
+}
+
+.member-name {
+  color: #ffffff;
+  margin: 0;
+  font-weight: 600;
+}
+
+.member-role {
+  color: #a1a1aa; /* Cor de texto suave */
+  font-weight: 500;
+  font-size: 11px;
+}
+
+/* Estilos específicos para o card de ação (Adicionar) */
+.action-card {
+  border: 2px dashed rgba(255, 255, 255, 0.3); /* Borda tracejada */
+  background-color: transparent; /* Fundo transparente */
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.action-card:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.action-icon-container {
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 8px;
+}
+
+.action-text {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+/* Reutilizando as classes de texto globais do seu app */
+.text-body-small {
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.text-label-caps {
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+/* botão adicionar */
+.add-music-btn {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+  background: #7980C9;
+  border: none;
+  padding: 4px 20px;
+  border-radius: 25px;
+}
+
+/* O "+" um pouco maior e destacado */
+.plus {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+}
