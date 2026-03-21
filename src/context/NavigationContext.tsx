@@ -4,7 +4,9 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 interface NavigationContextData {
   showPage: string;
   navigateTo: (page: string, id?: number) => void;
-  worship: any
+  worship: any,
+  loading: boolean
+  setLoading: (value: boolean) => void
 }
 
 // 2. Criando o contexto propriamente dito
@@ -14,15 +16,15 @@ const NavigationContext = createContext<NavigationContextData>({} as NavigationC
 export const NavigationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [showPage, setShowPage] = useState<string>('main'); // Valor inicial
   const [worship, setWorship] = useState({}); // Valor inicial
+  const [loading, setLoading] = useState(false)
 
   const navigateTo = (page: string, worship?: any) => {
     setShowPage(page);
     if(worship) setWorship(worship)
-      
   };
 
   return (
-    <NavigationContext.Provider value={{ showPage, navigateTo, worship }}>
+    <NavigationContext.Provider value={{ showPage, navigateTo, worship, setLoading, loading }}>
       {children}
     </NavigationContext.Provider>
   );

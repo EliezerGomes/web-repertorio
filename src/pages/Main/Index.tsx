@@ -3,47 +3,62 @@ import Card from "../../components/Card/Index";
 import { PiMoonFill, PiSunFill } from "react-icons/pi";
 import { db } from "../../services/firebase";
 import { collection, getDocs } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import type { IconType } from "react-icons";
+import { useNavigation } from "../../context/NavigationContext";
+import Loading from "../../components/Loading/Index";
 
 type WorshipType = {
-  id: string
-  day: string
-  description: string
-  hour: string
-  Icon: string
-  enable: boolean
-  singers: string[]
-}
+  id: string;
+  day: string;
+  description: string;
+  hour: string;
+  Icon: string;
+  enable: boolean;
+  singers: string[];
+};
 
 const mapIcon: Record<string, IconType> = {
-  "PiMoonFill": PiMoonFill,
-  "PiSunFill": PiSunFill
-}
+  PiMoonFill: PiMoonFill,
+  PiSunFill: PiSunFill,
+};
 
 export default function Main() {
-  const [worships, setWorships] = useState<WorshipType[] | []>([])
+  const [worships, setWorships] = useState<WorshipType[] | []>([]);
+  const { loading, setLoading } = useNavigation();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const getWorships = async () => {
-      const result = await getDocs(collection(db, "worship"))
-      const aux: WorshipType[] = result.docs.map(item => ({
-        id: item.id,
-        ...item.data()
-      }) as WorshipType)
-      
-      setWorships(aux)
-    }
+      setLoading(true);
+      try {
+        const result = await getDocs(collection(db, "worship"));
+        const aux: WorshipType[] = result.docs.map(
+          (item) =>
+            ({
+              id: item.id,
+              ...item.data(),
+            }) as WorshipType,
+        );
 
-    getWorships()
-  }, [])
+        setWorships(aux);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getWorships();
+  }, []);
+
+  if (loading) return <Loading />;
 
   return (
     <div className="main-container">
       <header className="page-header">
         <h1 className="text-headline text-primary">Cultos da semana</h1>
         <p className="text-body subdescription text-secondary">
-          Selecione o day do culto para adicionar músicas ao repertório.
+          Selecione o dia do culto para adicionar músicas ao repertório.
         </p>
       </header>
 
