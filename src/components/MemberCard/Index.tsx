@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify"; // Importe o toast
 import "./index.css";
 import { PiMicrophoneFill } from "react-icons/pi";
 import Modal from "../Modal/Index";
@@ -7,11 +8,12 @@ import camila from "../../assets/camila.png"
 import ingrid from "../../assets/ingrid.png"
 import adriane from "../../assets/adriane.png"
 import nadila from "../../assets/nadila.png"
+import { IoMdAlert } from "react-icons/io";
 
 interface MemberProps {
   id: string,
   name: string;
-  isLimitReached: Boolean
+  isLimitReached: boolean
   repertories: any[]
   getRepertories: () => void
 }
@@ -28,6 +30,25 @@ const MemberCard: React.FC<MemberProps> = (props) => {
   const { id, name, isLimitReached, repertories, getRepertories } = props;
   const [show, setShow] = useState(false);
 
+  const handleAddClick = () => {
+    if (isLimitReached) {
+      // Mensagem personalizada e amigável
+      toast.warning(`Limite atingido! ${name} já possui 2 músicas escaladas.`, {
+      icon: <IoMdAlert size={22} color="#f59e0b" />,
+      className: "custom-toast-warning",
+      progressClassName: "custom-toast-progress",
+      position: "top-right",
+      autoClose: 3500,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      theme: "dark",
+    });
+      return;
+    }
+    setShow(true);
+  };
   return (
     <>
       <div className="member-card">
@@ -39,7 +60,7 @@ const MemberCard: React.FC<MemberProps> = (props) => {
         </div>
         <h4 className="member-name text-body-small">{name}</h4>
 
-        <button disabled={isLimitReached} className="add-music-btn" onClick={() => setShow(true)} type="button">
+        <button className="add-music-btn" onClick={handleAddClick} type="button">
           <span className="plus">+</span>
           MÚSICA
         </button>

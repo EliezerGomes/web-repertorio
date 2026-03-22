@@ -8,7 +8,7 @@ export default function Header() {
         {/* Logo / Nome do app */}
         <div className="logo">
           <h1 className="text-headline" style={{color: "#BCC1FE", marginLeft: "20px"}}>
-            Chamados Por Ti
+            Web Repertório
           </h1>
         </div>
       </div>

@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import "./index.css";
 import { IoIosClose, IoIosLink } from "react-icons/io";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../../services/firebase";
 import { useNavigation } from "../../context/NavigationContext";
 
@@ -9,8 +15,9 @@ interface ModalProps {
   idSinger: number;
   isOpen: boolean;
   onClose: () => void;
-  repertories: any[]
-  getRepertories: () => void
+  repertories: any[];
+  getRepertories: () => void;
+  musicData?: (RepertorieType & { id: string }) | null;
 }
 
 type RepertorieType = {
@@ -19,52 +26,66 @@ type RepertorieType = {
   link: string;
   name_music: string;
   name_singer: string;
-  order: number
+  order: number;
 };
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, idSinger, repertories, getRepertories }) => {
+const Modal: React.FC<ModalProps> = ({
+  isOpen,
+  onClose,
+  idSinger,
+  repertories,
+  getRepertories,
+  musicData,
+}) => {
   const { worship } = useNavigation();
   const [obj, setObj] = useState<RepertorieType>({
-    id_singer: "",
-    id_worship: "",
-    link: "",
-    name_music: "",
-    name_singer: "",
-    order: 0
+    id_singer: musicData?.id_singer || idSinger || "",
+    id_worship: musicData?.id_worship || worship.id || "",
+    link: musicData?.link || "",
+    name_music: musicData?.name_music || "",
+    name_singer: musicData?.name_singer || "",
+    order: musicData?.order || 0,
   });
+  
   if (!isOpen) return null;
 
   async function sendRepertorie() {
-  if (!obj.name_music) {
-    alert("Preencha o nome da música!");
-    return;
+    const isEditing = !!musicData?.id;
+    if (!obj.name_music) {
+      alert("Preencha o nome da música!");
+      return;
+    }
+
+    try {
+      if (isEditing) {
+        const docRef = doc(db, "repertoire", musicData!.id);
+        await updateDoc(docRef, { ...obj });
+      } else {
+        const singerMusics = repertories.filter(
+          (m) => m.id_singer === idSinger && m.id_worship === worship.id,
+        );
+
+        const currentOrder = singerMusics.length + 1;
+
+        const repertoireRef = collection(db, "repertoire");
+
+        await addDoc(repertoireRef, {
+          name_music: obj.name_music,
+          name_singer: obj.name_singer,
+          id_singer: idSinger,
+          link: obj.link,
+          id_worship: worship.id,
+          order: currentOrder, // Agora salvamos 1 ou 2
+          createdAt: serverTimestamp(),
+        });
+      }
+
+        onClose();
+        getRepertories();
+    } catch (error) {
+      console.error("Erro ao salvar música:", error);
+    }
   }
-
-  try {
-    const singerMusics = repertories.filter(
-      (m) => m.id_singer === idSinger && m.id_worship === worship.id
-    );
-    
-    const currentOrder = singerMusics.length + 1;
-
-    const repertoireRef = collection(db, "repertoire");
-
-    await addDoc(repertoireRef, {
-      name_music: obj.name_music,
-      name_singer: obj.name_singer,
-      id_singer: idSinger,
-      link: obj.link,
-      id_worship: worship.id,
-      order: currentOrder, // Agora salvamos 1 ou 2
-      createdAt: serverTimestamp(),
-    });
-
-    onClose();
-    getRepertories()
-  } catch (error) {
-    console.error("Erro ao salvar música:", error);
-  }
-}
 
   return (
     <div className="modal-overlay">

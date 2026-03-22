@@ -2,6 +2,7 @@ import "./index.css";
 import type { IconType } from "react-icons";
 import { MdChevronRight } from "react-icons/md";
 import { useNavigation } from "../../context/NavigationContext";
+import { PiSunFill } from "react-icons/pi";
 
 type CardProps = {
   id: string;
@@ -21,7 +22,7 @@ const Card = ({ id, day, description, hour, Icon, singers }: CardProps) => {
 
   return (
     <div onClick={handleMext} className="evento-card">
-      <div className="evento-icon-container">
+      <div className="evento-icon-container" style={{ backgroundColor: Icon === PiSunFill ? "#d97706" : "#1a237e" }}>
         {Icon && <Icon size={28} className="evento-icon" />}
       </div>
 

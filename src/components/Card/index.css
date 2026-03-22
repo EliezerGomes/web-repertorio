@@ -10,7 +10,6 @@
 }
 
 .evento-icon-container {
-  background-color: #1a237e; /* Sua variável --primary */
   width: 56px;
   height: 56px;
   border-radius: 16px;
@@ -22,7 +21,7 @@
 
 .evento-icon {
   color: #9eb1ff; /* Um tom mais claro do ícone */
-  background: #1a237e;
+
 }
 
 .evento-info {
