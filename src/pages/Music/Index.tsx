@@ -36,31 +36,29 @@ const Music: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  useLayoutEffect(() => {
-    const getSingers = async () => {
-      setLoading(true);
-      try {
-        const result = await getDocs(collection(db, "singers"));
-        const aux: SingerType[] = result.docs
-          .filter((item) => worship.singers.includes(item.id))
-          .map(
-            (item) =>
-              ({
-                id: item.id,
-                ...item.data(),
-              }) as SingerType,
-          );
+useLayoutEffect(() => {
+  const getSingers = async () => {
+    setLoading(true);
+    try {
+      const result = await getDocs(collection(db, "singers"));
+      
+      const allSingers = result.docs.map(
+        (item) => ({ id: item.id, ...item.data() } as SingerType)
+      );
 
-        setSingers(aux);
-      } catch (error) {
-        console.error("Erro ao buscar cantores:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      const aux: SingerType[] = worship.singers
+        .map((id) => allSingers.find((s) => s.id === id))
+        .filter((s): s is SingerType => !!s);
+      setSingers(aux);
+    } catch (error) {
+      console.error("Erro ao buscar cantores:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    getSingers();
-  }, []);
+  getSingers();
+}, []);
 
   useLayoutEffect(() => {
     getRepertories();
@@ -210,8 +208,8 @@ const handleGenerateWhatsAppMessage = () => {
                   id={music.id}
                   title={music.name_music}
                   artist={music.name_singer}
-                  typeTag={""}
-                  coverImageUrl={music.link}
+                  id_singer={music.id_singer} // Passando o ID do cantor da música
+                  singersList={singers}
                   onEdit={() => handleOpenEdit(music)}
                   getRepertories={getRepertories}
                 />

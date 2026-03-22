@@ -10,6 +10,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../services/firebase";
 import { useNavigation } from "../../context/NavigationContext";
+import { toast } from "react-toastify";
 
 interface ModalProps {
   idSinger: number;
@@ -82,6 +83,7 @@ const Modal: React.FC<ModalProps> = ({
 
         onClose();
         getRepertories();
+        toast.success("Louvor adicionado com sucesso!");
     } catch (error) {
       console.error("Erro ao salvar música:", error);
     }
