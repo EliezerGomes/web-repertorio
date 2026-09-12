@@ -114,6 +114,34 @@ input:checked + .slider:before {
   transform: translateY(-2px);
 }
 
+/* Botão Gerar Escala */
+.btn-generate-schedule {
+  width: 100%;
+  margin-top: 12px;
+  background: var(--tertiare, #38bdf8);
+  color: #0f172a;
+  border: none;
+  padding: 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-generate-schedule:hover {
+  transform: translateY(-2px);
+}
+
+.btn-generate-schedule:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* Dropdown similar ao do setlist */
 .settings-dropdown {
   position: absolute;

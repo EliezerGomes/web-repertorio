@@ -9,6 +9,10 @@ import { db } from "../../services/firebase";
 import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import Loading from "../../components/Loading/Index";
 import Modal from "../../components/Modal/Index";
+import {
+  getSongsLimitPerSinger,
+  getWorshipSongsLimit,
+} from "../../utils/repertoireLimits";
 
 type SingerType = {
   id: string;
@@ -30,6 +34,13 @@ const Music: React.FC = () => {
   const [musicToEdit, setMusicToEdit] = useState<RepertoriesType | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+
+  const worshipSongsLimit = getWorshipSongsLimit(worship);
+  const songsLimitPerSinger = getSongsLimitPerSinger(
+    worshipSongsLimit,
+    worship?.singers?.length ?? 0,
+  );
+  const isWorshipFull = repertories.length >= worshipSongsLimit;
 
   const handleOpenEdit = (music: RepertoriesType) => {
     setMusicToEdit(music);
@@ -95,7 +106,7 @@ useLayoutEffect(() => {
           return indexA - indexB;
         }
 
-        // 3. Se for o mesmo cantor, ordena pelo campo 'order' (1 ou 2)
+        // 3. Se for o mesmo cantor, ordena pelo campo 'order'
         return a.order - b.order;
       });
 
@@ -171,7 +182,8 @@ const handleGenerateWhatsAppMessage = () => {
                 Vozes Escaladas
               </h2>
               <span className="section-subtitle text-label-small">
-                {singers.length} Integrantes
+                {singers.length} Integrantes • {songsLimitPerSinger}{" "}
+                {songsLimitPerSinger === 1 ? "louvor" : "louvores"} cada
               </span>
             </div>
 
@@ -186,7 +198,10 @@ const handleGenerateWhatsAppMessage = () => {
                     key={member.id}
                     id={member.id}
                     name={member.name}
-                    isLimitReached={songsCount >= 2} // Nova prop
+                    songsCount={songsCount}
+                    limitPerSinger={songsLimitPerSinger}
+                    worshipSongsLimit={worshipSongsLimit}
+                    isWorshipFull={isWorshipFull}
                     repertories={repertories}
                     getRepertories={getRepertories}
                   />

@@ -11,6 +11,10 @@ import {
 import { db } from "../../services/firebase";
 import { useNavigation } from "../../context/NavigationContext";
 import { toast } from "react-toastify";
+import {
+  getSongsLimitPerSinger,
+  getWorshipSongsLimit,
+} from "../../utils/repertoireLimits";
 
 interface ModalProps {
   idSinger: number;
@@ -62,9 +66,34 @@ const Modal: React.FC<ModalProps> = ({
         const docRef = doc(db, "repertoire", musicData!.id);
         await updateDoc(docRef, { ...obj });
       } else {
-        const singerMusics = repertories.filter(
-          (m) => m.id_singer === idSinger && m.id_worship === worship.id,
+        const worshipMusics = repertories.filter(
+          (m) => m.id_worship === worship.id,
         );
+        const singerMusics = worshipMusics.filter(
+          (m) => m.id_singer === idSinger,
+        );
+
+        const worshipSongsLimit = getWorshipSongsLimit(worship);
+        const limitPerSinger = getSongsLimitPerSinger(
+          worshipSongsLimit,
+          worship?.singers?.length ?? 0,
+        );
+
+        if (singerMusics.length >= limitPerSinger) {
+          toast.warning(
+            `Limite atingido! Cada cantor pode adicionar ${limitPerSinger} ${
+              limitPerSinger === 1 ? "louvor" : "louvores"
+            } neste culto.`,
+          );
+          return;
+        }
+
+        if (worshipMusics.length >= worshipSongsLimit) {
+          toast.warning(
+            `O culto já está completo com ${worshipSongsLimit} louvores.`,
+          );
+          return;
+        }
 
         const currentOrder = singerMusics.length + 1;
 
@@ -76,7 +105,7 @@ const Modal: React.FC<ModalProps> = ({
           id_singer: idSinger,
           link: obj.link,
           id_worship: worship.id,
-          order: currentOrder, // Agora salvamos 1 ou 2
+          order: currentOrder, // Posição da música dentro da lista do cantor
           createdAt: serverTimestamp(),
         });
       }

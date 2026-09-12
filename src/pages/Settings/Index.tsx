@@ -13,7 +13,11 @@ import { toast } from "react-toastify";
 import "./index.css";
 import { IoIosClose } from "react-icons/io";
 import { LuArrowUp, LuArrowDown, LuTrash2, LuCheck } from "react-icons/lu";
-import { PiMicrophoneFill } from "react-icons/pi";
+import { PiMicrophoneFill, PiMagicWandFill } from "react-icons/pi";
+import {
+  generateWeeklySchedule,
+  type GenerateScheduleResult,
+} from "../../services/scheduleGenerator";
 
 interface WorshipType {
   id?: string;
@@ -48,6 +52,12 @@ export default function Settings() {
   const [newSingerId, setNewSingerId] = useState("");
   const [isAddingSinger, setIsAddingSinger] = useState(false);
   const [tempSingerId, setTempSingerId] = useState("");
+
+  // Geração automática da escala semanal
+  const [isConfirmGenerateOpen, setIsConfirmGenerateOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generateResult, setGenerateResult] =
+    useState<GenerateScheduleResult | null>(null);
 
   // Estado do formulário
   const [formData, setFormData] = useState<WorshipType>({
@@ -207,6 +217,26 @@ export default function Settings() {
     }
   };
 
+  const handleGenerateSchedule = async () => {
+    setIsConfirmGenerateOpen(false);
+    setIsGenerating(true);
+    try {
+      const result = await generateWeeklySchedule();
+      setGenerateResult(result);
+      await fetchWorships();
+
+      navigator.clipboard.writeText(
+        "Paz pessoal, passando pra avisar que a escala da semana já está atualizada no site",
+      );
+      toast.success("Escala gerada! Mensagem copiada, é só colar no WhatsApp.");
+    } catch (error) {
+      console.error("Erro ao gerar escala:", error);
+      toast.error("Erro ao gerar a escala. Tente novamente.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <div className="settings-container">
       <div>
@@ -284,6 +314,15 @@ export default function Settings() {
 
       <button className="btn-add-worship" onClick={() => openEditModal()}>
         <MdAdd size={24} /> ADICIONAR NOVO CULTO
+      </button>
+
+      <button
+        className="btn-generate-schedule"
+        onClick={() => setIsConfirmGenerateOpen(true)}
+        disabled={isGenerating}
+      >
+        <PiMagicWandFill size={22} />
+        {isGenerating ? "Gerando..." : "Gerar Escala da Próxima Semana"}
       </button>
 
       {/* --- MODAL DE EDIÇÃO/CRIAÇÃO --- */}
@@ -468,6 +507,85 @@ export default function Settings() {
               >
                 <MdAdd size={20} /> ADICIONAR CANTOR
               </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* --- MODAL DE CONFIRMAÇÃO: GERAR ESCALA --- */}
+      {isConfirmGenerateOpen && (
+        <div className="modal-overlay">
+          <div className="confirm-modal-content">
+            <h3>Gerar escala da próxima semana?</h3>
+            <p>
+              Isso vai apagar os louvores já cadastrados nos cultos da
+              próxima semana e substituir a escala de cantores com base no
+              calendário mensal e no rodízio automático. Ajustes de
+              indisponibilidade continuam sendo manuais.
+            </p>
+            <div className="confirm-modal-actions">
+              <button
+                className="btn-cancel"
+                onClick={() => setIsConfirmGenerateOpen(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                className="btn-confirm-delete"
+                onClick={handleGenerateSchedule}
+              >
+                Sim, gerar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- MODAL DE RESULTADO DA GERAÇÃO --- */}
+      {generateResult && (
+        <div className="modal-overlay">
+          <div className="modal-content singers-modal">
+            <header className="modal-header">
+              <h2 className="text-headline-small">
+                Escala gerada — {generateResult.weekLabel}
+              </h2>
+              <button
+                className="close-button"
+                onClick={() => setGenerateResult(null)}
+              >
+                <IoIosClose size={32} />
+              </button>
+            </header>
+
+            <div className="singers-list-container">
+              {generateResult.assignments.map((a, idx) => (
+                <div key={idx} className="singer-order-item">
+                  <span className="singer-name text-primary">
+                    {a.day} — {a.description}
+                  </span>
+                  <span className="text-secondary" style={{ fontSize: 13 }}>
+                    {a.active
+                      ? a.singerNames.length > 0
+                        ? a.singerNames.join(", ")
+                        : "Ninguém escalado"
+                      : "Sem culto nesta semana"}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {generateResult.warnings.length > 0 && (
+              <div style={{ marginTop: 16 }}>
+                {generateResult.warnings.map((w, idx) => (
+                  <p
+                    key={idx}
+                    className="text-secondary"
+                    style={{ fontSize: 12, color: "#f59e0b" }}
+                  >
+                    ⚠ {w}
+                  </p>
+                ))}
+              </div>
             )}
           </div>
         </div>

@@ -13,7 +13,10 @@ import { IoMdAlert } from "react-icons/io";
 interface MemberProps {
   id: string,
   name: string;
-  isLimitReached: boolean
+  songsCount: number
+  limitPerSinger: number
+  worshipSongsLimit: number
+  isWorshipFull: boolean
   repertories: any[]
   getRepertories: () => void
 }
@@ -27,13 +30,31 @@ const images: Record<string, string> = {
 }
 
 const MemberCard: React.FC<MemberProps> = (props) => {
-  const { id, name, isLimitReached, repertories, getRepertories } = props;
+  const {
+    id,
+    name,
+    songsCount,
+    limitPerSinger,
+    worshipSongsLimit,
+    isWorshipFull,
+    repertories,
+    getRepertories,
+  } = props;
   const [show, setShow] = useState(false);
+
+  const hasReachedOwnLimit = songsCount >= limitPerSinger;
+  const isLimitReached = hasReachedOwnLimit || isWorshipFull;
 
   const handleAddClick = () => {
     if (isLimitReached) {
+      const message = hasReachedOwnLimit
+        ? `Limite atingido! ${name} já possui ${limitPerSinger} ${
+            limitPerSinger === 1 ? "música escalada" : "músicas escaladas"
+          }.`
+        : `O culto já está completo com ${worshipSongsLimit} louvores.`;
+
       // Mensagem personalizada e amigável
-      toast.warning(`Limite atingido! ${name} já possui 2 músicas escaladas.`, {
+      toast.warning(message, {
       icon: <IoMdAlert size={22} color="#f59e0b" />,
       className: "custom-toast-warning",
       progressClassName: "custom-toast-progress",

@@ -25,7 +25,18 @@
 
 .container-principal {
   height: 100vh;
+  height: 100dvh;
   position: relative;
+  overflow: hidden;
+}
+
+/* Área rolável entre o Header e o Footer, ambos fora do fluxo de scroll:
+   cada um ocupa só a própria altura, e é essa div que rola por dentro. */
+.app-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Headline */

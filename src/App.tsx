@@ -43,12 +43,11 @@ function App() {
         flexDirection: "column",
         display: "flex",
         background: "#0F172A",
-        paddingBottom: isAdmin ? "70px" : "0",
       }}
     >
       <Header />
 
-      {renderPage()}
+      <main className="app-content">{renderPage()}</main>
       {isAdmin && <Footer />}
       <ToastContainer />
     </div>
