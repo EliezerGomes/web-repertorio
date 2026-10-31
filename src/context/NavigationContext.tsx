@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, type ReactNode } from 'react';
 
 // 1. Tipagem do Contexto
 interface NavigationContextData {
   showPage: string;
-  navigateTo: (page: string, id?: number) => void;
+  navigateTo: (page: string, worship?: any) => void;
   worship: any,
   loading: boolean
   setLoading: (value: boolean) => void

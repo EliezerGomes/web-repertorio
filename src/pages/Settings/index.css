@@ -289,3 +289,8 @@ input:checked + .slider {
 .actions-dropdown .delete-opt {
   color: #ef4444; /* Vermelho para remover */
 }
+.singers-settings { margin-bottom: 36px; }
+.month-selector { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 20px; }
+.month-selector input { color-scheme: dark; padding: 10px 14px; border-radius: 8px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; }
+.switch input:focus-visible + .slider { outline: 2px solid #bcc1fe; outline-offset: 4px; }
+.switch input:disabled + .slider { opacity: 0.5; cursor: wait; }

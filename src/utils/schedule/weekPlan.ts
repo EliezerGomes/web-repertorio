@@ -10,22 +10,19 @@ import {
 // regras de elegibilidade dependem de qual delas é).
 export type ServiceKey =
   | "alinhamento" // Quarta-feira
-  | "sexta-sem-culto" // 1ª/5ª sexta do mês: não há culto
-  | "sexta-princesas" // 2ª sexta do mês
-  | "sexta-valentes" // 3ª sexta do mês
-  | "sexta-tribo-leoes" // 4ª sexta do mês
-  | "familia" // Domingo à noite
-  | "gloria"; // Domingo de manhã (só no 1º domingo do mês)
+  | "sexta-sem-culto" // 1ª e 5ª sexta
+  | "sexta-princesas" // 2ª sexta
+  | "sexta-tribo-leoes" // 4ª sexta
+  | "sexta-valentes" // 3ª sexta
+  | "familia"
+  | "gloria";
 
 export type ServicePlan = {
   key: ServiceKey;
   day: "Quarta-feira" | "Sexta-feira" | "Domingo";
-  /** Período do dia, usado para diferenciar os dois cultos de domingo. */
   period: "manha" | "noite";
-  /** Descrição a ser salva no culto. Null quando não há culto nessa semana. */
   description: string | null;
   active: boolean;
-  /** Quantas vagas de cantor esse culto tem. */
   seats: number;
 };
 
@@ -37,9 +34,6 @@ export type WeekPlan = {
   services: ServicePlan[];
 };
 
-// 1ª sexta do mês: sem culto. 2ª: Princesas. 3ª: Valentes (só 1 vaga,
-// exclusivo do Erick). 4ª: Tribo de Leões. 5ª (meses raros com 5 sextas):
-// sem culto, mesma regra da 1ª.
 const FRIDAY_SERVICE_BY_OCCURRENCE: Record<
   number,
   { key: ServiceKey; description: string | null; seats: number }

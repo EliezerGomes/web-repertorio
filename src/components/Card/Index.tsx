@@ -11,13 +11,14 @@ type CardProps = {
   Icon: IconType;
   description: string;
   singers: string[]
+  date?: string;
 };
 
-const Card = ({ id, day, description, hour, Icon, singers }: CardProps) => {
+const Card = ({ id, day, description, hour, Icon, singers, date }: CardProps) => {
   const { navigateTo } = useNavigation();
 
   function handleMext() {
-    navigateTo("music", {id, day, description, hour, singers});
+    navigateTo("music", {id, day, description, hour, singers, date});
   }
 
   return (
@@ -27,7 +28,7 @@ const Card = ({ id, day, description, hour, Icon, singers }: CardProps) => {
       </div>
 
       <div className="evento-info">
-        <h3 className="text-headline-small">{day}</h3>
+        <h3 className="text-headline-small">{day}{date ? ` · ${date.split("-").reverse().join("/")}` : ""}</h3>
         <div className="evento-details">
           <span className="text-label-caps">{description}</span>
           <span className="dot">•</span>

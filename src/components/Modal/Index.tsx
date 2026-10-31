@@ -17,7 +17,7 @@ import {
 } from "../../utils/repertoireLimits";
 
 interface ModalProps {
-  idSinger: number;
+  idSinger: string | null;
   isOpen: boolean;
   onClose: () => void;
   repertories: any[];

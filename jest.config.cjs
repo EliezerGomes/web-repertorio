@@ -3,7 +3,7 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   moduleNameMapper: {
     // Evita que o Jest quebre ao tentar ler arquivos de CSS ou Imagens
-    '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
+    '\\.(css|less|sass|scss)$': '<rootDir>/__mocks__/styleMock.cjs',
     '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/__mocks__/fileMock.js',
     // Se você usa caminhos com '@/' no Vite, descomente a linha abaixo:
     '^@/(.*)$': '<rootDir>/src/$1',

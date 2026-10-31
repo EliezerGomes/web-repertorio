@@ -15,12 +15,16 @@ import { IoIosClose } from "react-icons/io";
 import { LuArrowUp, LuArrowDown, LuTrash2, LuCheck } from "react-icons/lu";
 import { PiMicrophoneFill, PiMagicWandFill } from "react-icons/pi";
 import {
-  generateWeeklySchedule,
-  type GenerateScheduleResult,
-} from "../../services/scheduleGenerator";
+  generateMonthlySchedule,
+  type MonthlyResult,
+} from "../../services/monthlySchedule";
+import { dateLabel, getNextScheduleMonth } from "../../utils/schedule/monthPlan";
+
+import { fetchSingers, setSingerActive, type Singer } from "../../services/singers";
 
 interface WorshipType {
   id?: string;
+  date?: string;
   day: string;
   description: string;
   enable: boolean;
@@ -29,15 +33,40 @@ interface WorshipType {
   singers: string[];
 }
 
-const allMembers = [
-  { id: "KE81ihXDYPCwOZMDaC2y", name: "Ingrid" },
-  { id: "Vxb4PlodkFcG3OkCXMZX", name: "Camila" },
-  { id: "WBJ7JU8oIhbYOKrwVzL9", name: "Erick" },
-  { id: "ubMq7aEEqoXbsMTzTwEw", name: "Nadila" },
-  { id: "wvccqsbxHRTN2SkIGCLG", name: "Adriane" },
-];
-
 export default function Settings() {
+  const scheduleMonth = getNextScheduleMonth();
+  const [allMembers, setAllMembers] = useState<Singer[]>([]);
+  const [singersLoading, setSingersLoading] = useState(true);
+  const [singersError, setSingersError] = useState(false);
+  const [savingSingerId, setSavingSingerId] = useState<string | null>(null);
+
+  const loadSingers = async () => {
+    setSingersLoading(true);
+    setSingersError(false);
+    try {
+      setAllMembers(await fetchSingers());
+    } catch {
+      setSingersError(true);
+      toast.error("Erro ao carregar cantores. Tente novamente.");
+    } finally {
+      setSingersLoading(false);
+    }
+  };
+
+  const handleSingerActive = async (singer: Singer) => {
+    setSavingSingerId(singer.id);
+    try {
+      await setSingerActive(singer.id, !singer.active);
+      setAllMembers((members) => members.map((member) =>
+        member.id === singer.id ? { ...member, active: !singer.active } : member,
+      ));
+      toast.success("Status do cantor salvo!");
+    } catch {
+      toast.error("Erro ao salvar status do cantor. Tente novamente.");
+    } finally {
+      setSavingSingerId(null);
+    }
+  };
   const [worships, setWorships] = useState<WorshipType[]>([]);
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
 
@@ -49,7 +78,6 @@ export default function Settings() {
   );
 
   const [isSingersModalOpen, setIsSingersModalOpen] = useState(false);
-  const [newSingerId, setNewSingerId] = useState("");
   const [isAddingSinger, setIsAddingSinger] = useState(false);
   const [tempSingerId, setTempSingerId] = useState("");
 
@@ -57,7 +85,7 @@ export default function Settings() {
   const [isConfirmGenerateOpen, setIsConfirmGenerateOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateResult, setGenerateResult] =
-    useState<GenerateScheduleResult | null>(null);
+    useState<MonthlyResult | null>(null);
 
   // Estado do formulário
   const [formData, setFormData] = useState<WorshipType>({
@@ -77,18 +105,9 @@ export default function Settings() {
     setWorships(data);
   };
 
-//   const fetchMembers = async () => {
-//     const querySnapshot = await getDocs(collection(db, "members")); // ajuste para o nome da sua coleção de pessoas
-//     const data = querySnapshot.docs.map((doc) => ({
-//       id: doc.id,
-//       name: doc.data().name,
-//     }));
-//     setAllMembers(data);
-//   };
-
   useEffect(() => {
     fetchWorships();
-    // fetchMembers();
+    loadSingers();
   }, []);
 
   // Abrir modal para Adicionar ou Editar
@@ -99,6 +118,7 @@ export default function Settings() {
     } else {
       setSelectedWorship(null);
       setFormData({
+        date: `${scheduleMonth}-01`,
         day: "",
         description: "",
         enable: true,
@@ -115,13 +135,18 @@ export default function Settings() {
   const handleSaveWorship = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const data = { ...formData };
+      if (data.date) {
+        const day = new Date(`${data.date}T12:00:00`).toLocaleDateString("pt-BR", { weekday: "long" });
+        data.day = day.charAt(0).toUpperCase() + day.slice(1);
+      }
       if (selectedWorship?.id) {
         await updateDoc(doc(db, "worship", selectedWorship.id), {
-          ...formData,
+          ...data,
         });
         toast.success("Culto atualizado!");
       } else {
-        await addDoc(collection(db, "worship"), formData);
+        await addDoc(collection(db, "worship"), data);
         toast.success("Novo culto adicionado!");
       }
       setIsModalOpen(false);
@@ -179,14 +204,6 @@ export default function Settings() {
     updateSingersOrder(newSingers);
   };
 
-  const handleAddSinger = async () => {
-    if (!selectedWorship || !newSingerId) return;
-    const updatedList = [...selectedWorship.singers, newSingerId];
-    await updateSingersOrder(updatedList);
-    setNewSingerId("");
-    toast.success("Cantor adicionado!");
-  };
-
   const handleRemoveSinger = async (idToRemove: string) => {
     if (!selectedWorship) return;
     const updatedList = selectedWorship.singers.filter(
@@ -221,14 +238,11 @@ export default function Settings() {
     setIsConfirmGenerateOpen(false);
     setIsGenerating(true);
     try {
-      const result = await generateWeeklySchedule();
+      const result = await generateMonthlySchedule();
       setGenerateResult(result);
       await fetchWorships();
 
-      navigator.clipboard.writeText(
-        "Paz pessoal, passando pra avisar que a escala da semana já está atualizada no site",
-      );
-      toast.success("Escala gerada! Mensagem copiada, é só colar no WhatsApp.");
+      toast.success(`${result.created} cultos criados. Escala mensal atualizada!`);
     } catch (error) {
       console.error("Erro ao gerar escala:", error);
       toast.error("Erro ao gerar a escala. Tente novamente.");
@@ -239,19 +253,47 @@ export default function Settings() {
 
   return (
     <div className="settings-container">
+      <section className="singers-settings" aria-labelledby="singers-settings-title">
+        <header className="settings-header">
+          <h2 id="singers-settings-title" className="text-headline-small text-primary">Configurações dos cantores</h2>
+          <p className="text-body-small text-secondary">
+            Apenas cantores ativos participam da geração da escala mensal.
+            As alterações são salvas automaticamente e não modificam a escala atual.
+          </p>
+        </header>
+        {singersLoading && <p className="text-secondary" role="status">Carregando cantores...</p>}
+        {singersError && <button className="btn-add-singer-row" onClick={loadSingers}>Tentar carregar cantores novamente</button>}
+        <div className="worship-list">
+          {allMembers.map((singer) => (
+            <div key={singer.id} className="worship-item-card">
+              <div className="worship-info">
+                <span className="worship-day-name">{singer.name}</span>
+                <span className="worship-desc">{savingSingerId === singer.id ? "Salvando..." : singer.active ? "Ativo" : "Inativo"}</span>
+              </div>
+              <label className="switch">
+                <input type="checkbox" role="switch" aria-label={`Ativar ${singer.name}`}
+                  checked={singer.active} disabled={savingSingerId !== null || isGenerating}
+                  onChange={() => handleSingerActive(singer)} />
+                <span className="slider round" />
+              </label>
+            </div>
+          ))}
+        </div>
+      </section>
       <div>
         <header className="settings-header">
           <h2 className="text-headline-small text-primary">Gestão de Cultos</h2>
           <p className="text-body-small text-secondary">
             Controle os dias e horários das celebrações.
           </p>
+          <p className="month-selector text-secondary">Próxima escala: {scheduleMonth.split("-").reverse().join("/")}</p>
         </header>
 
         <div className="worship-list">
-          {worships.map((w) => (
+          {worships.filter((w) => w.date?.startsWith(scheduleMonth) || !w.date).sort((a, b) => (a.date ?? "").localeCompare(b.date ?? "") || a.hour.localeCompare(b.hour)).map((w) => (
             <div key={w.id} className="worship-item-card">
               <div className="worship-info">
-                <span className="worship-day-name text-primary">{w.day}</span>
+                <span className="worship-day-name text-primary">{w.date ? `${dateLabel(w.date)} · ` : "Escala anterior · "}{w.day}</span>
                 <span className="worship-desc text-secondary">
                   {w.hour}h - {w.description}
                 </span>
@@ -274,7 +316,7 @@ export default function Settings() {
                   <button
                     className="music-action-button"
                     onClick={() =>
-                      setMenuOpenId(menuOpenId === w.id ? null : w.id)
+                      setMenuOpenId(menuOpenId === w.id ? null : w.id ?? null)
                     }
                   >
                     <MdMoreVert size={24} />
@@ -319,10 +361,10 @@ export default function Settings() {
       <button
         className="btn-generate-schedule"
         onClick={() => setIsConfirmGenerateOpen(true)}
-        disabled={isGenerating}
+        disabled={isGenerating || singersLoading || singersError || savingSingerId !== null}
       >
         <PiMagicWandFill size={22} />
-        {isGenerating ? "Gerando..." : "Gerar Escala da Próxima Semana"}
+        {isGenerating ? "Gerando..." : "Gerar Escala do Próximo Mês"}
       </button>
 
       {/* --- MODAL DE EDIÇÃO/CRIAÇÃO --- */}
@@ -341,7 +383,13 @@ export default function Settings() {
               </button>
             </header>
 
-            <form className="modal-form" onSubmit={(e) => e.preventDefault()}>
+            <form className="modal-form" onSubmit={handleSaveWorship}>
+              <div className="input-group">
+                <label htmlFor="worship-date" className="text-label-caps">Data do culto</label>
+                <input id="worship-date" type="date" className="modal-input" value={formData.date ?? ""}
+                  required={!selectedWorship || !!selectedWorship.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })} />
+              </div>
               <div className="input-group">
                 <label className="text-label-caps">Dia do Culto</label>
                 <input
@@ -381,7 +429,7 @@ export default function Settings() {
                 />
               </div>
 
-              <button onClick={handleSaveWorship} className="save-button">
+              <button type="submit" className="save-button">
                 Salvar
               </button>
             </form>
@@ -516,12 +564,10 @@ export default function Settings() {
       {isConfirmGenerateOpen && (
         <div className="modal-overlay">
           <div className="confirm-modal-content">
-            <h3>Gerar escala da próxima semana?</h3>
+            <h3>Gerar escala de {scheduleMonth.split("-").reverse().join("/")}?</h3>
             <p>
-              Isso vai apagar os louvores já cadastrados nos cultos da
-              próxima semana e substituir a escala de cantores com base no
-              calendário mensal e no rodízio automático. Ajustes de
-              indisponibilidade continuam sendo manuais.
+              Serão criados os cultos que faltam no mês, considerando os cantores
+              ativos e o rodízio. Cultos e músicas já cadastrados serão preservados.
             </p>
             <div className="confirm-modal-actions">
               <button
@@ -547,7 +593,7 @@ export default function Settings() {
           <div className="modal-content singers-modal">
             <header className="modal-header">
               <h2 className="text-headline-small">
-                Escala gerada — {generateResult.weekLabel}
+                Escala mensal — {generateResult.month.split("-").reverse().join("/")}
               </h2>
               <button
                 className="close-button"

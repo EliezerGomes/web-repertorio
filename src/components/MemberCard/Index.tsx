@@ -3,11 +3,7 @@ import { toast } from "react-toastify"; // Importe o toast
 import "./index.css";
 import { PiMicrophoneFill } from "react-icons/pi";
 import Modal from "../Modal/Index";
-import erick from "../../assets/erick.png"
-import camila from "../../assets/camila.png"
-import ingrid from "../../assets/ingrid.png"
-import adriane from "../../assets/adriane.png"
-import nadila from "../../assets/nadila.png"
+import { singerImages as images } from "../../constants/singerImages";
 import { IoMdAlert } from "react-icons/io";
 
 interface MemberProps {
@@ -19,14 +15,6 @@ interface MemberProps {
   isWorshipFull: boolean
   repertories: any[]
   getRepertories: () => void
-}
-
-const images: Record<string, string> = {
-  "KE81ihXDYPCwOZMDaC2y": ingrid,
-  "Vxb4PlodkFcG3OkCXMZX": camila,
-  "WBJ7JU8oIhbYOKrwVzL9": erick,
-  "ubMq7aEEqoXbsMTzTwEw": nadila,
-  "wvccqsbxHRTN2SkIGCLG": adriane
 }
 
 const MemberCard: React.FC<MemberProps> = (props) => {
@@ -74,7 +62,13 @@ const MemberCard: React.FC<MemberProps> = (props) => {
     <>
       <div className="member-card">
         <div className="member-avatar-container">
-          <img src={images[id]} alt={name} className="member-avatar" />
+          {images[id] ? (
+            <img src={images[id]} alt={name} className="member-avatar" />
+          ) : (
+            <div className="member-avatar-placeholder" aria-label={`${name}, sem foto`}>
+              {name.charAt(0).toUpperCase()}
+            </div>
+          )}
           <div className="member-badge">
             <PiMicrophoneFill size={14} className="member-badge-icon" />
           </div>

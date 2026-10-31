@@ -6,6 +6,7 @@ export const SINGER_IDS = {
   ERICK: "WBJ7JU8oIhbYOKrwVzL9",
   NADILA: "ubMq7aEEqoXbsMTzTwEw",
   ADRIANE: "wvccqsbxHRTN2SkIGCLG",
+  THALIA: "thalia",
 } as const;
 
 export type Gender = "M" | "F";
@@ -25,4 +26,5 @@ export const SINGER_INFO: Record<string, SingerInfo> = {
   [SINGER_IDS.ERICK]: { name: "Erick", gender: "M" },
   [SINGER_IDS.NADILA]: { name: "Nadila", gender: "F" },
   [SINGER_IDS.ADRIANE]: { name: "Adriane", gender: "F" },
+  [SINGER_IDS.THALIA]: { name: "Thalia", gender: "F" },
 };

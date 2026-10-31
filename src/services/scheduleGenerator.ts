@@ -14,6 +14,7 @@ import {
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { SINGER_IDS } from "../constants/singers";
+import { fetchSingers, type Singer } from "./singers";
 import {
   formatDatePtBr,
   formatWeekKey,
@@ -65,7 +66,7 @@ type ScaleHistoryDoc = {
   entries: ScaleHistoryEntry[];
 };
 
-type SingerRoster = { id: string; name: string };
+type SingerRoster = Singer;
 
 type WorkingCandidate = {
   id: string;
@@ -156,11 +157,6 @@ async function findOrCreateWorshipDoc(
   return { id: ref.id, ...newDocData };
 }
 
-async function fetchSingers(): Promise<SingerRoster[]> {
-  const snap = await getDocs(collection(db, "singers"));
-  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
-}
-
 async function fetchRecentHistory(
   excludingWeekKey: string,
 ): Promise<ScaleHistoryDoc[]> {
@@ -179,7 +175,7 @@ function buildCandidates(
   singers: SingerRoster[],
   historyMostRecentFirst: ScaleHistoryEntry[][],
 ): WorkingCandidate[] {
-  return singers.map((s) => {
+  return singers.filter((s) => s.active).map((s) => {
     let timesScheduled = 0;
     let lastSungIndex = Infinity;
     historyMostRecentFirst.forEach((weekEntries, idx) => {

@@ -6,7 +6,7 @@ import SetlistMusicCard from "../../components/SetListMusicCard/Index";
 import { FiChevronLeft } from "react-icons/fi"; // Um chevron mais fino e moderno
 import { useNavigation } from "../../context/NavigationContext";
 import { db } from "../../services/firebase";
-import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import Loading from "../../components/Loading/Index";
 import Modal from "../../components/Modal/Index";
 import {
@@ -20,6 +20,9 @@ type SingerType = {
 };
 
 type RepertoriesType = {
+  id: string;
+  order: number;
+  artist?: string;
   id_singer: string;
   id_worship: string;
   link: string;
@@ -58,8 +61,8 @@ useLayoutEffect(() => {
       );
 
       const aux: SingerType[] = worship.singers
-        .map((id) => allSingers.find((s) => s.id === id))
-        .filter((s): s is SingerType => !!s);
+        .map((id: string) => allSingers.find((s) => s.id === id))
+        .filter((s: SingerType | undefined): s is SingerType => !!s);
       setSingers(aux);
     } catch (error) {
       console.error("Erro ao buscar cantores:", error);
@@ -123,6 +126,7 @@ const handleGenerateWhatsAppMessage = () => {
 
   // 1. Cabeçalho formatado
   let message = `*REPERTÓRIO - ${worship.day.toUpperCase()}*\n`;
+  if (worship.date) message += `${worship.date.split("-").reverse().join("/")} · ${worship.hour} · ${worship.description}\n`;
   message += `\n`;
   worship.singers.forEach((singerId: string) => {
     const singerInfo = singers.find(s => s.id === singerId);
@@ -132,7 +136,7 @@ const handleGenerateWhatsAppMessage = () => {
     if (singerMusics.length > 0) {
       message += `*${singerName.toUpperCase()}*\n`;
       message += `\n`;
-      singerMusics.forEach((music, index) => {
+      singerMusics.forEach((music) => {
         message += `- ${music.name_music} | _${music.artist || music.name_singer}_\n`;
         
         if (music.link) {
@@ -165,7 +169,7 @@ const handleGenerateWhatsAppMessage = () => {
               <div className="event-meta">
                 <div className="event-date">
                   <PiCalendarFill className="meta-icon" size={18} />
-                  <span className="text-body">{worship.day}</span>
+                  <span className="text-body">{worship.day}{worship.date ? ` · ${worship.date.split("-").reverse().join("/")}` : ""}</span>
                 </div>
                 <div className="event-time">
                   <PiClockFill className="meta-icon" size={18} />
